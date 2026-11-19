@@ -57,6 +57,7 @@
   .ibtn { width:var(--ib,32px); height:var(--ib,32px); border-radius:50%; border:2px solid rgba(255,255,255,.35); background:rgba(0,0,0,.45); color:#fff; font-size:calc(var(--ib,32px)*.45); line-height:1; padding:0; cursor:pointer; }
   .ibtn.off { opacity:.35; }
   #touchui { display:none; }
+  #launchBtn, .nbtn, canvas#c { -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
   body.touch.ingame #touchui { display:block; }
   .nbtn { position:fixed; bottom:max(14px,env(safe-area-inset-bottom)); width:58px; height:58px; border-radius:50%; background:rgba(255,255,255,.1); border:2px solid rgba(255,255,255,.35); color:#fff; font-size:22px; z-index:5; }
   #nM { right:10px; bottom:calc(46% - 70px); }

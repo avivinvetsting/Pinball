@@ -11,3 +11,4 @@
 - 2026-11-18 [Claude]: Flipper strike physics fixed (single clean hit, eHit 0.72, wUp 21); stuck-behind-upper-flipper fixed (Orbital Ace guide walls + displacement-based stuck guard); 3 blueprint tables added (DARK QUEST, SPY ESPIONAGE, ARCADE FRENZY; built by Sonnet subagent, reviewed). Node tests + browser render of new tables passed.
 - 2026-11-18 [Claude]: Rebuilt DARK QUEST / SPY ESPIONAGE / ARCADE FRENZY to follow the user's blueprints (walled lanes, U-turns, orbits, inner-wall banks); added lane/bank helpers, overlay tool and per-table playability checks. 3 Sonnet subagents in parallel, reviewed; Spy sent back once for a dead left flipper.
 - 2026-11-19 [Claude]: Uploaded project to GitHub (avivinvetsting/Pinball) and published via GitHub Pages; verified site loads with 8 tables and 3D render, no console errors.
+- 2026-11-19 [Claude]: Blocked the long-press context menu on the touch launch/nudge buttons (Android tablet popup); pushed to GitHub Pages.

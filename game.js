@@ -615,6 +615,8 @@
   lbtn.addEventListener('pointerup', lrel); lbtn.addEventListener('pointercancel', lrel);
   const nb = (id, dx, dy) => $(id).addEventListener('pointerdown', (e) => { A.init(); nudge(dx, dy); e.preventDefault(); });
   nb('nL', -1, 0); nb('nR', 1, 0); nb('nU', 0, -1);
+  // long-press on a touch button must not open the browser's context menu / selection popup
+  for (const id of ['launchBtn', 'nL', 'nR', 'nU']) $(id).addEventListener('contextmenu', (e) => e.preventDefault());
 
   $('pauseBtn').onclick = () => (game.state === 'paused' ? resume() : pause());
   $('homeBtn').onclick = (e) => { e.preventDefault(); pause(); };
