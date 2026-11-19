@@ -9,6 +9,9 @@ Generating five original illustrated playfield assets via built-in ImageGen. Rep
 ## Open tasks
 Finish and inspect artwork, save assets in project; implement distinct layouts and 3D props; verify all shots/ramps and game flow; inspect five final screenshots and mobile sizing. Previous test results are in log.md and apply to earlier version only.
 
+## Hosting
+[Claude] Published on GitHub Pages: https://avivinvetsting.github.io/Pinball/ (repo avivinvetsting/Pinball, branch main, root). To update the site: commit and `git push`. `student-reviews/` is git-ignored (private student work).
+
 ## Files
 render3d.js, render.js, tables.js, game.js, style.css, index.html; assets/ (new artwork), tests/physics-check.cjs and tests/browser-check.js. Historical notes: log.md.
 
