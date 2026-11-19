@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>The Pinball Collection — פינבול 3D</title>
+<style>
+  :root { --glow:#ffcf5a; --bg1:#0b0f2b; --bg2:#1a0b38; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; height:100%; overflow:hidden; background:#1c3f86; color:#eaf0ff; font-family:"Segoe UI",Arial,sans-serif; touch-action:none; user-select:none; -webkit-user-select:none; }
+  body { background:radial-gradient(ellipse at 50% 35%, var(--bg1) 0%, var(--bg2) 100%); transition:background .6s; }
+  canvas#c { position:fixed; inset:0; width:100%; height:100%; display:block; touch-action:none; }
+
+  /* side panels (wide screens only) */
+  aside { position:fixed; top:50%; transform:translateY(-50%); width:clamp(190px,17vw,300px); padding:16px 18px; border:1px solid rgba(255,255,255,.4); border-radius:14px; background:rgba(10,20,60,.55); backdrop-filter:blur(4px); font-size:14px; line-height:1.7; display:none; }
+  aside h3 { margin:0 0 8px; color:var(--glow); font-size:15px; letter-spacing:.5px; }
+  aside kbd { display:inline-block; min-width:26px; padding:1px 7px; margin:1px; text-align:center; border-radius:6px; background:#1b2036; border:1px solid #4a5280; border-bottom-width:3px; font:600 12px Consolas,monospace; color:#fff; }
+  aside ol { margin:0; padding:0 22px 0 0; } aside li.none { list-style:none; opacity:.5; margin-right:-22px; }
+  #left { left:max(10px,calc(50% - 300px - clamp(190px,17vw,300px) - 24px)); }
+  #right { right:max(10px,calc(50% - 300px - clamp(190px,17vw,300px) - 24px)); }
+  @media (min-aspect-ratio: 13/10) { aside { display:block; } }
+
+  /* overlays */
+  .overlay { position:fixed; inset:0; display:none; z-index:10; align-items:center; justify-content:center; flex-direction:column; background:rgba(3,4,12,.82); backdrop-filter:blur(3px); overflow:auto; padding:18px; }
+  .overlay.show { display:flex; }
+  #menu { justify-content:flex-start; background:linear-gradient(160deg,#3a2aa8 0%,#1c78d0 50%,#14a6a0 100%); }
+  h1 { margin:6px 0 2px; font-size:clamp(30px,6vw,64px); letter-spacing:3px; font-weight:900; text-align:center; background:linear-gradient(90deg,#00e5ff,#ff2bd6,#ffcf5a,#00e5ff); background-size:300% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:slide 6s linear infinite; direction:ltr; }
+  @keyframes slide { to { background-position:300% 0; } }
+  .sub { opacity:.75; margin:0 0 14px; font-size:clamp(13px,2vw,18px); text-align:center; }
+  #cards { display:flex; gap:14px; width:100%; max-width:1300px; justify-content:center; flex-wrap:wrap; direction:ltr; }
+  .card { width:clamp(150px,18vw,235px); background:linear-gradient(#2c3a8a,#1a2160); color:#fff; border:2px solid #7f8fe0; border-radius:16px; padding:10px; cursor:pointer; text-align:center; font-family:inherit; display:flex; flex-direction:column; gap:4px; transition:transform .15s, border-color .15s, box-shadow .15s; direction:rtl; }
+  .card.sel, .card:hover { transform:translateY(-6px) scale(1.02); border-color:#ffcf5a; box-shadow:0 10px 30px rgba(255,207,90,.25); }
+  .card .th { border-radius:10px; overflow:hidden; background:#000; line-height:0; }
+  .card .th canvas { width:100%; height:auto; max-height:36vh; object-fit:cover; object-position:top; }
+  .card b { font-size:16px; letter-spacing:1px; margin-top:4px; direction:ltr; }
+  .card .he { color:#ffcf5a; font-size:14px; }
+  .card .stars { color:#ffcf5a; letter-spacing:2px; direction:ltr; } .card .stars i { color:#3a3f66; font-style:normal; }
+  .card small { opacity:.7; font-size:11.5px; line-height:1.35; min-height:46px; }
+  .card em { font-style:normal; color:#7dffb0; font-size:12px; }
+  .howto { max-width:1000px; margin-top:16px; display:flex; gap:22px; flex-wrap:wrap; justify-content:center; font-size:14px; line-height:1.8; }
+  .howto div { background:rgba(0,0,40,.35); border:1px solid #7f8fe0; border-radius:12px; padding:10px 16px; min-width:260px; }
+  .howto h4 { margin:0 0 4px; color:#ffcf5a; }
+  .howto kbd { display:inline-block; min-width:24px; padding:0 6px; text-align:center; border-radius:5px; background:#1b2036; border:1px solid #4a5280; border-bottom-width:3px; font:600 12px Consolas,monospace; }
+  .box { background:#0e1230; border:2px solid var(--glow); border-radius:18px; padding:26px 34px; text-align:center; min-width:280px; box-shadow:0 0 40px color-mix(in srgb,var(--glow) 40%,transparent); }
+  .box h2 { margin:0 0 8px; font-size:30px; color:var(--glow); }
+  .big { font:900 44px "Courier New",monospace; color:#ffb347; text-shadow:0 0 14px #ff8a1f; direction:ltr; margin:6px 0; }
+  .btn { font-family:inherit; font-size:18px; font-weight:700; margin:8px 5px 0; padding:10px 26px; border-radius:12px; border:2px solid var(--glow); background:#171c44; color:#fff; cursor:pointer; }
+  .btn:hover { background:var(--glow); color:#000; }
+  #overList { list-style:none; padding:0; margin:10px 0 0; direction:ltr; font:600 17px "Courier New",monospace; } #overList li { opacity:.8; } #overList li.me { color:#7dffb0; opacity:1; }
+  #overList li::before { content:counter(r) ". "; counter-increment:r; opacity:.5; } #overList { counter-reset:r; }
+
+  /* in-game small buttons */
+  #ibar { position:fixed; left:0; top:0; display:none; gap:4px; z-index:5; direction:ltr; }
+  body.ingame #ibar { display:flex; }
+  .ibtn { width:var(--ib,32px); height:var(--ib,32px); border-radius:50%; border:2px solid rgba(255,255,255,.35); background:rgba(0,0,0,.45); color:#fff; font-size:calc(var(--ib,32px)*.45); line-height:1; padding:0; cursor:pointer; }
+  .ibtn.off { opacity:.35; }
+  #touchui { display:none; }
+  body.touch.ingame #touchui { display:block; }
+  .nbtn { position:fixed; bottom:max(14px,env(safe-area-inset-bottom)); width:58px; height:58px; border-radius:50%; background:rgba(255,255,255,.1); border:2px solid rgba(255,255,255,.35); color:#fff; font-size:22px; z-index:5; }
+  #nM { right:10px; bottom:calc(46% - 70px); }
+  #nL { left:10px; bottom:46%; } #nR { right:10px; bottom:46%; } #nU { left:10px; bottom:calc(46% - 70px); }
+  #launchBtn { position:fixed; left:50%; bottom:max(12px,env(safe-area-inset-bottom)); transform:translateX(-50%); display:none; z-index:6; padding:12px 26px; font:900 17px Verdana; opacity:.9; border-radius:40px; border:3px solid #4dff88; color:#4dff88; background:rgba(0,40,20,.55); touch-action:none; direction:ltr; }
+  body.touch #launchBtn.show { display:block; } #launchBtn:active { background:#4dff88; color:#000; }
+  #hint { position:fixed; left:0; right:0; bottom:4px; text-align:center; font-size:12px; opacity:.5; pointer-events:none; display:none; }
+  body.touch.ingame #hint { display:block; }
+  body.touch #launchBtn.show ~ #hint { display:none; }
+</style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage3d" aria-hidden="true"></div>
+<canvas id="c"></canvas>
+<header id="gameTop"><a class="brand" href="#" id="homeBtn">THE PINBALL COLLECTION<span>חדר הארקייד שלכם</span></a><div class="topActions"><span id="renderStatus">תלת־ממד · 3D</span><button id="speedBtn" type="button" title="שינוי מהירות המשחק">מהיר ×1.2</button><button id="cameraBtn" type="button">זווית משחק</button></div></header>
+<section id="scorePanel" aria-label="ניקוד המשחק"><span class="eyebrow">NOW PLAYING</span><h2 id="liveTitle"></h2><div class="scoreLabel">הניקוד שלכם</div><strong id="liveScore">0</strong><div class="scoreStats"><div>כדור<strong id="liveBall">1 / 5</strong></div><div>מכפיל<strong id="liveBonus">×1</strong></div></div><div class="bestLine">השיא האישי <b id="liveBest">0</b></div><div class="missionBox"><span class="missionTag" id="liveCombo">MISSION</span><p id="liveMission"></p></div><div class="statusNote"><i></i> FREE PLAY · משחק חופשי</div></section>
+<div id="liveMessage" role="status" aria-live="polite"></div>
+<div id="powerMeter"><span>עוצמת שיגור</span><div><i id="powerFill"></i></div></div>
+<footer id="gameFooter"><span>01 — 08 / THE COLLECTION</span><span><kbd>←</kbd> <kbd>→</kbd> פליפרים &nbsp; <kbd>SPACE</kbd> שיגור &nbsp; <kbd>P</kbd> השהיה</span><span>HOLD. RELEASE. REPEAT.</span></footer>
+
+<aside id="left">
+  <h3>🎮 מקשים</h3>
+  <div>פליפר שמאלי: <kbd>←</kbd> <kbd>Z</kbd> <kbd>A</kbd></div>
+  <div>פליפר ימני: <kbd>→</kbd> <kbd>/</kbd> <kbd>D</kbd> <kbd>L</kbd></div>
+  <div>שיגור: החזק <kbd>↓</kbd> / <kbd>Space</kbd> ושחרר</div>
+  <div>נדנוד: <kbd>Q</kbd> <kbd>E</kbd> <kbd>↑</kbd> (לא להגזים – TILT!)</div>
+  <div>השהיה <kbd>P</kbd> · מוזיקה <kbd>M</kbd> · צלילים <kbd>N</kbd></div>
+  <div class="upperTip">קומה 2: כוונו לכניסה המוארת של הרמפה בצד שמאל. השלימו סיבוב לבונוס.</div>
+</aside>
+<aside id="right">
+  <h3>🏆 שיאים – <span id="hsTitle"></span></h3>
+  <ol id="hsList"></ol>
+  <hr style="border-color:#2a3166;margin:10px 0">
+  <h3>💡 טיפים</h3>
+  <div>• 3 שלבי צלחת = <b>MULTIBALL</b></div>
+  <div>• בשולחן הקלאסי: אספו מספרים 1-4 → בומפרים דולקים ×10 → SPECIAL בחורים = משחק חינם</div>
+  <div>• בסוף המשחק: MATCH – אם הספרה תואמת, משחק חינם</div>
+  <div>• 3 נורות עליונות = מכפיל בונוס</div>
+  <div>• פגעו בכל מטרות הנופלות לבונוס</div>
+  <div>• שיגור מושלם (פס ירוק) = Skill Shot</div>
+  <div>• השלימו את המילה על המגרש = בונוס 50,000</div>
+</aside>
+
+<div id="menu" class="overlay">
+  <div class="menuTop"><span class="brand">THE PINBALL COLLECTION</span><span class="edition">FIVE TABLES. ENDLESS PLAY.</span><span class="freeBadge">● FREE PLAY</span></div>
+  <div class="menuIntro"><span class="eyebrow">THE ARCADE, REIMAGINED</span><h1>מכונות של פעם.<br><em>משחק שמרגישים.</em></h1><p class="sub">שמונה שולחנות, עולם שלם של אור ומתכת.<br>בחרו מכונה, שגרו כדור ושברו את השיא.</p></div>
+  <div class="collectionHeading"><span>בחרו את השולחן שלכם</span><span>THE COLLECTION / 01—08</span></div>
+  <div id="cards"></div>
+  <div class="howto">
+    <div><h4>🖥️ מחשב</h4>
+      פליפרים: <kbd>←</kbd> / <kbd>→</kbd> (או <kbd>Z</kbd> <kbd>/</kbd>)<br>
+      שיגור: החזק <kbd>↓</kbd> או <kbd>Space</kbd> ושחרר<br>
+      נדנוד: <kbd>Q</kbd> <kbd>E</kbd> <kbd>↑</kbd> · השהיה: <kbd>P</kbd> · בחירה: <kbd>←</kbd><kbd>→</kbd> + <kbd>Enter</kbd></div>
+    <div><h4>📱 טאבלט / מגע</h4>
+      לחצו על <b>חצי המסך השמאלי</b> / <b>הימני</b> להפעלת הפליפרים<br>
+      החזיקו את כפתור <b>LAUNCH</b> ושחררו לשיגור<br>
+      כפתורי הנדנוד בצדי המסך · אפשר גם לנער את המכשיר</div>
+  </div>
+</div>
+
+<div id="pause" class="overlay"><div class="box"><h2>⏸ מושהה</h2>
+  <button class="btn" id="resumeBtn">המשך</button><button class="btn" id="quitBtn">תפריט</button></div></div>
+
+<div id="over" class="overlay"><div class="box"><h2>GAME OVER</h2>
+  <div id="overTable" style="opacity:.7;direction:ltr"></div>
+  <div class="big" id="overScore">0</div><div id="overRank" style="color:#7dffb0;min-height:24px"></div>
+  <div id="overMatch" style="font:700 18px 'Courier New',monospace;color:#ffe14a;direction:ltr"></div><div id="overCredits" style="opacity:.7;direction:ltr"></div>
+  <ul id="overList"></ul>
+  <button class="btn" id="againBtn">שחק שוב</button><button class="btn" id="menuBtn">תפריט</button></div></div>
+
+<div id="ibar"><button class="ibtn" id="sfxBtn" title="Sound">🔊</button><button class="ibtn" id="musicBtn" title="Music">♪</button><button class="ibtn" id="pauseBtn" title="Pause">⏸</button></div>
+<div id="touchui">
+  <button class="nbtn" id="nL">◀</button><button class="nbtn" id="nU">▲</button><button class="nbtn" id="nR">▶</button>
+</div>
+<button id="launchBtn">⬇ HOLD &amp; RELEASE</button>
+<div id="hint">מסך שמאל/ימין = פליפרים</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="engine.js"></script>
+<script src="assets/artwork-data.js"></script>
+<script src="tables.js"></script>
+<script src="tables/quest.js"></script>
+<script src="tables/spy.js"></script>
+<script src="tables/frenzy.js"></script>
+<script src="designs.js"></script>
+<script src="audio.js"></script>
+<script src="render.js"></script>
+<script src="render3d.js"></script>
+<script src="game.js"></script>
+<script>
+  // mark in-game state on body for CSS
+  setInterval(function () {
+    var g = window.Pin && window.Pin.game;
+    document.body.classList.toggle('ingame', !!g && g.state !== 'menu');
+  }, 150);
+</script>
+</body>
+</html>

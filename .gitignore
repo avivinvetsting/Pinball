@@ -1,0 +1,5 @@
+student-reviews/
+.playwright-mcp/
+.claude/
+node_modules/
+*.log
